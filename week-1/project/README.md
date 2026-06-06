@@ -2,6 +2,10 @@
 
 > **Mission:** Build a minimal C++ trading-platform runner that executes a **judge-defined strategy spec**, replays historical market ticks against it, verifies correctness, measures end-to-end latency per decision, and prints a summary. Over the next 4 weeks we will turn this into a multi-threaded, lock-free, networked, leaderboard-ranked beast. This week, just get the correct synchronous baseline walking.
 
+## Output Preview
+
+<img width="1092" height="192" alt="image" src="https://github.com/user-attachments/assets/b24e4fe7-86cb-4114-87cc-43beabe843b6" />
+
 ## Directory Layout
 
 ```
