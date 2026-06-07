@@ -14,10 +14,8 @@ struct Engine {
     std::deque<std::string> symbol_storage;
     std::unordered_map<std::string_view, std::string_view> symbol_map;
 
-    // Load market data from CSV file
     void load_ticks(const std::string& path);
 
-    // Run strategy against the loaded ticks
     void run(Strategy& strategy);
 
 private:
