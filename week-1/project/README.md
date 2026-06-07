@@ -45,7 +45,7 @@ The hardware on which this program was run on has the following specifications:
 
 ## Optimizations
 - The first optimization to be made was to replace the for-loops that calculate the sum every tick with rolling-sums which store the sum of the previous window. These sums are updated by adding the new value and subtracting the oldest value. This gives a major boost as it an O(1) operation per tick.
-- Then, the unordered_map was replaced with a simple linear search for symbol-matching. This works better as accessing an item from a vector/array is much faster than from a map in C++
+- Then, the unordered_map was replaced with a simple linear search for symbol-matching. This works better as accessing an item from a vector/array is much faster than from a map in C++ if you know the index. (More about this later)
 - The calculation of standard deviation was removed entirely, as the sqrt function takes up a lot of cpu cycles. Consequently every value that the standard deviation was being compared to was now squared and then compared with the variance instead. A similar trick was used to avoid division. At many places, division by x replaced with multiplication by (1/x) as multiplication is inherently faster in low-level operations
 
 ## Structure of Input Data
@@ -64,4 +64,7 @@ According to the online judge, the latency numbers achieved by `spec_strategy.so
 ## `perf stat` Snippet
 <img width="1158" height="366" alt="image" src="https://github.com/user-attachments/assets/a89a61c7-0a65-45ac-a91c-c2472b53ed90" />
 
-## Interesting observations
+## Interesting Observations
+I expected the performance to worsen if we replaced the unordered_map for symbol recognition with a linear search. Because accessing elements in an unordered_map is supposed to be O(1) and a linear search is supposed to be O(n). But the exact opposite happened, the linear search performed much better than the unordered_map. <br>
+This is due to the fact that the big-O notation is invalid for small values of n, as it only talks about asymptotic time complexities. We are dealing with n = 64, which means we are comparing 64 small instructions (linear search) against 1 big instruction (accessing an element in an unordered_map). <br>
+Internally, the unordered_map performs hashing which, as we proved experimentally, performs worse than simply checking 64 values. Hashing would have been useful if we were dealing with a larger number of items because then the extra constant factor that hashing brings would be overpowered by the linear-dependency on n which the linear search method has.
