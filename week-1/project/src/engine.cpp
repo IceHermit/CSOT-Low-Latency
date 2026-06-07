@@ -19,7 +19,7 @@ std::string_view Engine::intern(const std::string& symbol) {
 void Engine::load_ticks(const std::string& path) {
     std::ifstream file(path);
     std::string line, val;
-    std::getline(file, line); // Skip header
+    std::getline(file, line);
 
     while (std::getline(file, line)) {
         std::stringstream ss(line);
@@ -51,22 +51,16 @@ void Engine::run(Strategy& strategy) {
         hist.record(duration);
         
         for (const auto& order : orders) {
-            // 1. Calculate fill price and quantity using the current 'tick' and 'order'
-            //    based on your STRATEGY_SPEC.md rules. 
-            //    (Below is the standard aggressive top-of-book matching pattern)
-            
             double fill_price = 0.0;
             uint32_t fill_qty = 0;
 
-            if (order.side == Order::Side::BUY) { // Or however your Side enum/struct is defined
+            if (order.side == Order::Side::BUY) {
                 fill_price = tick.ask_px; 
                 fill_qty = std::min(order.qty, tick.ask_qty); 
             } else {
                 fill_price = tick.bid_px;
                 fill_qty = std::min(order.qty, tick.bid_qty);
             }
-
-            // 2. Pass all 3 required arguments to update the strategy state
             strategy.on_fill(order, fill_price, fill_qty);
         }
     }
