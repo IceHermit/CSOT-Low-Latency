@@ -56,7 +56,7 @@ The hardware on which this program was run on has the following specifications:
 - In an L2 miss, the new memory address is installed into L2, and then recursively into L1.
 - If the new memory address has a pending write operation on it, it is marked as dirty, which makes sure that the value is overwritten when this value is required next time.
 
-In a program with ideal throughput, the memory is managed such that L1 hits are maximised. Every L1 miss means waste of multiple precious CPU cycles.
+In a program with ideal throughput, the memory is managed such that L1 hits are maximised. Every L1 miss means a waste of precious CPU cycles.
 
 ## `perf stat` Preview
 
