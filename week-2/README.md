@@ -32,7 +32,7 @@ project/
 - Navigate to `week-2/project`
 - Run `cmake -B build -DCSOT_CACHE_SIM_SRC=cache_sim.cpp && cmake --build build -j`. This builds the `cache_sim.cpp` script.
 - Run `perf stat ./build/cache_sim_runner data/tiny.trace`. This runs the built `cache_sim.cpp` on `tiny.trace` and returns the performance stats.
-- If you want to run the simulator on a larger dataset, run `python3 data/gen_trace.py --accesses 5000000 --seed 42 --out public.trace`, then `perf stat ./build/cache_sim_runner data/public.trace`
+- If you want to run the simulator on a larger dataset, run `python3 data/gen_trace.py --accesses 5000000 --seed 42 --out data/public.trace`, then `perf stat ./build/cache_sim_runner data/public.trace`
 
 ## Hardware
 The hardware on which this program was run on has the following specifications:
