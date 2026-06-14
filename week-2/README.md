@@ -2,10 +2,6 @@
 
 > **Mission:** Implement a **single `cache_sim.cpp`** that simulates a fixed two-level cache hierarchy over a huge memory trace, emits the exact reference counters, and does it **as fast as wall-clock allows**. Week 1 taught you to measure a hot loop; Week 2 is where you make one disappear into the cache. Same "fastest correct implementation" game, brand-new kernel — one with far more room to optimize: struct-of-arrays state, branchless set lookup, compile-time geometry, prefetch, SIMD tag compares.
 
-## Output Preview
-
-<img width="908" height="443" alt="image" src="https://github.com/user-attachments/assets/2b998909-a8d0-44f0-b934-c104a0c93fc1" />
-
 ## Directory Layout
 
 ```
@@ -46,3 +42,25 @@ The hardware on which this program was run on has the following specifications:
 - System Type:	64-bit operating system, x64-based processor
 - OS: Windows 10
 
+## Optimizations
+- The SoA structure was used in place of AoS, as this gave empirically better results.
+- A lot of if statements were replaced with bitwise operators as those are faster on the low-level.
+- A temporal filter was used: if the tag of the current operation is the same as the previous one, repeat everything done last time and save a whole iteration.
+
+## Working of the Cache
+- This cache simulator simulates L1 and L2 cache.
+- Whenever a memory address is referred to, first the L1 cache is checked. If the memory address is found in L1, then it is called an L1 hit and this is the fastest route.
+- However if the memory address is not in L1, then L2 is checked. This is called an L1 miss.
+- If the memory address is found in L2, it is called an L2 hit, this is slower than L1 hit but still fast. The new memory address is installed into L1.
+- The worst case happens when the memory address is not even found in L2, in this case it has to be brought from the DRAM to L2. This is an L2 miss and this is the slowest route.
+- In an L2 miss, the new memory address is installed into L2, and then recursively into L1.
+- If the new memory address has a pending write operation on it, it is marked as dirty, which makes sure that the value is overwritten when this value is required next time.
+
+In a program with ideal throughput, the memory is managed such that L1 hits are maximised. Every L1 miss means waste of multiple precious CPU cycles.
+
+## `perf stat` Preview
+
+<img width="908" height="443" alt="image" src="https://github.com/user-attachments/assets/2b998909-a8d0-44f0-b934-c104a0c93fc1" />
+
+## Interesting Observations
+The fact that bitwise operations are so much faster than if-else statements was surprising to me. The performance improvements from seemingly small changes were massive, often increasing the throughput by ~4 M acc/s. I did need to look up many of these bitwise operations, or take help from LLMs to understand them, though.
