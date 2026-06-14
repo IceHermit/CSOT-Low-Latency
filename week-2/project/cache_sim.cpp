@@ -1,21 +1,3 @@
-// ============================================================================
-//  cache_sim.stub.cpp — STARTING POINT for the Week-2 cache-sim challenge.
-//
-//  Copy this to `cache_sim.cpp`, then make it correct, then make it fast:
-//      cp samples/cache_sim.stub.cpp cache_sim.cpp
-//      cmake -B build -DCSOT_CACHE_SIM_SRC=cache_sim.cpp && cmake --build build -j
-//      ./build/cache_sim_runner data/tiny.trace      # compare to data/tiny.stats.json
-//
-//  This stub COMPILES and RUNS but is INTENTIONALLY NOT A CORRECT SIMULATOR.
-//  It counts reads/writes and treats every access as an L1 miss + L2 miss so
-//  you can see the harness work end-to-end. Your job is to implement the real
-//  two-level hierarchy from CACHE_SPEC.md so the seven counters match the
-//  reference exactly — and then to make run() as fast as you can.
-//
-//  Everything must live in this ONE translation unit. The judge builds exactly
-//  this file against its own main(); no extra .cpp, no custom CMake.
-// ============================================================================
-
 #include "cache_sim.hpp"
 
 #include <array>
@@ -61,7 +43,6 @@ static inline __attribute__((always_inline)) std::uint32_t touch(std::uint32_t l
         return (lru & ~(lower_mask | (0xFU << shift))) | ((lru & lower_mask) << 4) | way;
     }
 
-    // OPTIMIZATION 1: Completely branchless victim selection (removes the ternary branch)
     static inline __attribute__((always_inline)) std::size_t victim_way(std::uint32_t current_lru, std::uint8_t valid_mask) {
         std::uint32_t invalid_mask = static_cast<std::uint8_t>(~valid_mask);
         std::uint32_t ctz = __builtin_ctz(invalid_mask | 0x100); 
@@ -69,7 +50,7 @@ static inline __attribute__((always_inline)) std::uint32_t touch(std::uint32_t l
         return (ctz < 8) ? ctz : lru_way;
     }
 
-static inline __attribute__((always_inline)) int find_matching_way(const std::uint64_t* __restrict set_tags, std::uint64_t target_tag) {
+    static inline __attribute__((always_inline)) int find_matching_way(const std::uint64_t* __restrict set_tags, std::uint64_t target_tag) {
         for (int i = 0; i < 8; ++i) {
             if (set_tags[i] == target_tag) return i;
         }
@@ -126,7 +107,7 @@ static inline __attribute__((always_inline)) int find_matching_way(const std::ui
             const std::uint64_t s2_offset = s2 << 3;
             const std::uint64_t t2 = b >> 9;
 
-            // ---- L2 Cache Lookup ----
+            // L2 Cache Lookup
             int w2 = find_matching_way(&L2_tag[s2_offset], t2);
 
             if (w2 >= 0) {
@@ -139,7 +120,7 @@ static inline __attribute__((always_inline)) int find_matching_way(const std::ui
 
                 L2_valid_mask[s2] |= (1U << v2);
                 L2_dirty_mask[s2] &= ~(1U << v2);
-                L2_tag[s2_offset + v2] = t2; // Flat index assignment
+                L2_tag[s2_offset + v2] = t2;
 
                 L2_LRU[s2] = touch(L2_LRU[s2], v2);
             }
