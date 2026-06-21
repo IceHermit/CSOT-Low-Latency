@@ -83,45 +83,38 @@ public:
                     
                     std::size_t i = start_idx;
                     
-                    // Step 1: 4x Loop Unrolling to maximize instruction-level parallelism (ILP)
                     for (; i + 4 <= end_idx; i += 4) {
                         const csot::AggTick& t0 = current_ticks_[i];
                         const csot::AggTick& t1 = current_ticks_[i + 1];
                         const csot::AggTick& t2 = current_ticks_[i + 2];
                         const csot::AggTick& t3 = current_ticks_[i + 3];
 
-                        // Prefetch next cache lines ahead to eliminate latency bottlenecks
-                        #if defined(__GNUC__) || defined(__clang__)
+#if defined(__GNUC__) || defined(__clang__)
                         __builtin_prefetch(&current_ticks_[i + 16], 0, 3);
-                        #endif
+#endif
 
                         csot::SymbolAgg& r0 = my_table[t0.symbol_id];
                         csot::SymbolAgg& r1 = my_table[t1.symbol_id];
                         csot::SymbolAgg& r2 = my_table[t2.symbol_id];
                         csot::SymbolAgg& r3 = my_table[t3.symbol_id];
 
-                        // Process element 0
                         if (r0.count == 0) { r0.min_price = t0.price; r0.max_price = t0.price; }
                         else { if (t0.price < r0.min_price) r0.min_price = t0.price; if (t0.price > r0.max_price) r0.max_price = t0.price; }
                         r0.count += 1; r0.sum_price += t0.price; r0.sum_qty += t0.qty;
 
-                        // Process element 1
                         if (r1.count == 0) { r1.min_price = t1.price; r1.max_price = t1.price; }
                         else { if (t1.price < r1.min_price) r1.min_price = t1.price; if (t1.price > r1.max_price) r1.max_price = t1.price; }
                         r1.count += 1; r1.sum_price += t1.price; r1.sum_qty += t1.qty;
 
-                        // Process element 2
                         if (r2.count == 0) { r2.min_price = t2.price; r2.max_price = t2.price; }
                         else { if (t2.price < r2.min_price) r2.min_price = t2.price; if (t2.price > r2.max_price) r2.max_price = t2.price; }
                         r2.count += 1; r2.sum_price += t2.price; r2.sum_qty += t2.qty;
 
-                        // Process element 3
                         if (r3.count == 0) { r3.min_price = t3.price; r3.max_price = t3.price; }
                         else { if (t3.price < r3.min_price) r3.min_price = t3.price; if (t3.price > r3.max_price) r3.max_price = t3.price; }
                         r3.count += 1; r3.sum_price += t3.price; r3.sum_qty += t3.qty;
                     }
 
-                    // Clean up any remaining tail iterations safely
                     for (; i < end_idx; ++i) {
                         const csot::AggTick& tick = current_ticks_[i];
                         csot::SymbolAgg& r = my_table[tick.symbol_id];
