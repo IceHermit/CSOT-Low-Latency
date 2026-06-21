@@ -7,5 +7,5 @@
 <br>
   <li><b>Week 02</b> has concluded. This week's objective was to build a cache-simulator: A C++ programme that would read a .trace file and keep a check of the number of read/write instructions, along with L1 and L2 stats. For more information, check the README.md under <i>week-2/</i></li>
 <br>
-  <li><b>Week 03</b> has concluded. Thi week's objective was to experiment with threading and parallelism. A simple counter program was first made using a single thread, then it was optimised to use multiple threads. For more information, check the README.md under <i>week-3/</i></li>
+  <li><b>Week 03</b> has concluded. This week's objective was to experiment with threading and parallelism. A simple counter program was first made using a single thread, then it was optimised to use multiple threads. For more information, check the README.md under <i>week-3/</i></li>
 </ul>
